@@ -22,7 +22,7 @@ class ResponseMessage extends Message {
     /**
      * @return array
      */
-    public function getContent(): array {
+    protected function getContent(): array {
         return [$this->error, $this->data];
     }
 

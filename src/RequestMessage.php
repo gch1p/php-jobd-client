@@ -30,7 +30,7 @@ class RequestMessage extends Message {
     /**
      * @return string[]
      */
-    public function getContent(): array {
+    protected function getContent(): array {
         $request = ['type' => $this->requestType];
         if (!is_null($this->requestData))
             $request['data'] = $this->requestData;
