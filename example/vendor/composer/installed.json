@@ -1,0 +1,27 @@
+{
+    "packages": [
+        {
+            "name": "ch1p/jobd-client",
+            "version": "1.0",
+            "version_normalized": "1.0.0.0",
+            "dist": {
+                "type": "path",
+                "url": "..",
+                "reference": "084d0d0e0ec68c71f414fa62c6c089aae51c1a9b"
+            },
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "jobd\\": "src/"
+                }
+            },
+            "transport-options": {
+                "relative": true
+            },
+            "install-path": "../ch1p/jobd-client"
+        }
+    ],
+    "dev": true,
+    "dev-package-names": []
+}

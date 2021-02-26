@@ -1,0 +1,37 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "50c0d7581897dc28f75a92f41008c613",
+    "packages": [
+        {
+            "name": "ch1p/jobd-client",
+            "version": "1.0",
+            "dist": {
+                "type": "path",
+                "url": "..",
+                "reference": "084d0d0e0ec68c71f414fa62c6c089aae51c1a9b"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "jobd\\": "src/"
+                }
+            },
+            "transport-options": {
+                "relative": true
+            }
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": [],
+    "plugin-api-version": "2.0.0"
+}
