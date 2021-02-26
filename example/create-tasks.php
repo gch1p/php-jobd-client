@@ -1,10 +1,15 @@
 <?php
 
+// this just adds a bunch of meaningless tasks, for testing purposees
+//
+// in a real world, you will have additional fields in your table
+// like 'job_name' and 'job_data'
+
 $db = new mysqli();
 if (!$db->real_connect('10.211.55.6', 'jobd', 'password', 'jobd'))
     die('Failed to connect.');
 
-$target = 'server1';
+$target = 'server3';
 $slots = ['low', 'normal', 'high'];
 
 for ($i = 0; $i < 100; $i++) {
