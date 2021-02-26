@@ -20,6 +20,7 @@ class Client {
      * @param int $port
      * @param string $host
      * @param string $password
+     * @throws \Exception
      */
     public function __construct(int $port, string $host = '127.0.0.1', string $password = '') {
         $this->port = $port;
@@ -32,7 +33,8 @@ class Client {
     }
 
     /**
-     * @return mixed
+     * @return ResponseMessage
+     * @throws \Exception
      */
     public function ping() {
         $this->send(new RequestMessage('ping'));
@@ -41,7 +43,8 @@ class Client {
 
     /**
      * @param array $targets
-     * @return mixed
+     * @return ResponseMessage
+     * @throws \Exception
      */
     public function poke(array $targets) {
         $this->send(new RequestMessage('poke', ['targets' => $targets]));
@@ -49,13 +52,19 @@ class Client {
     }
 
     /**
-     * @return mixed
+     * @return ResponseMessage
+     * @throws \Exception
      */
     public function status() {
         $this->send(new RequestMessage('status'));
         return $this->recv();
     }
 
+    /**
+     * @param array $targets
+     * @return ResponseMessage
+     * @throws \Exception
+     */
     public function poll(array $targets) {
         $this->send(new RequestMessage('poll', ['targets' => $targets]));
         return $this->recv();
@@ -63,7 +72,7 @@ class Client {
 
     /**
      * @param int $id
-     * @return mixed
+     * @return ResponseMessage
      */
     public function runManual(int $id) {
         $this->send(new RequestMessage('run-manual', ['id' => $id]));
@@ -83,7 +92,8 @@ class Client {
     }
 
     /**
-     * @return mixed
+     * @return ResponseMessage
+     * @throws \Exception
      */
     public function recv() {
         $messages = [];
@@ -113,13 +123,25 @@ class Client {
         if (count($messages) > 1)
             trigger_error(__METHOD__.": received more than one message");
 
-        return self::parseMessage($messages[0]);
+        $response = self::parseMessage($messages[0]);
+        if (!($response instanceof ResponseMessage))
+            throw new \Exception('Unexpected message type');
+
+        if ($error = $response->getError())
+            throw new \Exception('jobd error: '.$response->getError());
+
+        return $response;
     }
 
+    /**
+     * @param string $raw_string
+     * @return RequestMessage|ResponseMessage
+     * @throws \Exception
+     */
     protected static function parseMessage(string $raw_string) {
         $raw = json_decode($raw_string, true);
         if (!is_array($raw) || count($raw) != 2)
-            throw new \Exception("Malformed response: {$raw_string}");
+            throw new \Exception("Malformed message: {$raw_string}");
 
         list($type, $data) = $raw;
 
@@ -140,6 +162,9 @@ class Client {
 
                 $message = new ResponseMessage(...$data);
                 return $message;
+
+            default:
+                throw new \Exception("Malformed message: unexpected type {$type}");
         }
     }
 
