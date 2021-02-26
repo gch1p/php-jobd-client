@@ -11,5 +11,8 @@
     "psr-4": {
       "jobd\\": "src/"
     }
+  },
+  "require": {
+    "ext-mysqli": "*"
   }
 }
