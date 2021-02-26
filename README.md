@@ -19,14 +19,18 @@ Here's a small example.
 try {
     $jobd = new jobd\Client(jobd\Client::MASTER_PORT, '127.0.0.1');
 } catch (Exception $e) {
-    die('Failed to connect.');
+    die("Failed to connect.\n");
 }
 
-// poke master to send poll requests to workers
-$response = $jobd->poke(['target_name', 'another_name']);
-
-// get status from master
-$response = $status = $jobd->status();
+try {
+    // poke master to send poll requests to workers
+    $response = $jobd->poke(['target_name', 'another_name']);
+    
+    // get status from master
+    $status = $jobd->status()->getData();
+} catch (Exception $e) {
+    die('jobd error: '.$e->getMessage()."\n");
+}
 
 $jobd->close();
 ```
