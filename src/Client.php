@@ -5,8 +5,8 @@ namespace jobd;
 
 class Client {
 
-    const WORKER_PORT = 13596;
-    const MASTER_PORT = 13597;
+    const WORKER_PORT = 7080;
+    const MASTER_PORT = 7081;
 
     const EOT = "\4";
 
