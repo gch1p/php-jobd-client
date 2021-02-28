@@ -110,7 +110,7 @@ class Client {
     /**
      * @param Message $message
      */
-    protected function send(Message $message) {
+    public function send(Message $message) {
         $serialized = $message->serialize();
         fwrite($this->sock, $serialized . self::EOT);
     }
