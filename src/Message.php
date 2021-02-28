@@ -7,6 +7,8 @@ abstract class Message {
 
     const REQUEST = 0;
     const RESPONSE = 1;
+    const PING = 2;
+    const PONG = 3;
 
     protected $type;
 
@@ -27,10 +29,13 @@ abstract class Message {
      * @return string
      */
     public function serialize(): string {
-        return json_encode([
-            $this->type,
-            $this->getContent()
-        ]);
+        $data = [$this->type];
+        $content = $this->getContent();
+
+        if (!empty($content))
+            $data[] = $content;
+
+        return json_encode($data);
     }
 
 }

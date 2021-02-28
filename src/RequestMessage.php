@@ -4,6 +4,7 @@ namespace jobd;
 
 class RequestMessage extends Message {
 
+    protected $requestNo;
     protected $requestType;
     protected $requestData;
     protected $password;
@@ -28,12 +29,27 @@ class RequestMessage extends Message {
     }
 
     /**
+     * @param int $no
+     */
+    public function setRequestNo(int $no) {
+        $this->requestNo = $no;
+    }
+
+    /**
      * @return string[]
      */
     protected function getContent(): array {
-        $request = ['type' => $this->requestType];
+        $request = [
+            'type' => $this->requestType,
+            'no' => $this->requestNo,
+        ];
+
         if (!is_null($this->requestData))
             $request['data'] = $this->requestData;
+
+        if (!is_null($this->password))
+            $request['password'] = $this->password;
+
         return $request;
     }
 

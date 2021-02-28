@@ -4,17 +4,21 @@ namespace jobd;
 
 class ResponseMessage extends Message {
 
+    protected $requestNo;
     protected $error;
     protected $data;
 
     /**
      * Response constructor.
+     *
+     * @param int $requestNo
      * @param null $error
      * @param null $data
      */
-    public function __construct($error = null, $data = null) {
+    public function __construct($request_no, $error = null, $data = null) {
         parent::__construct(Message::RESPONSE);
 
+        $this->requestNo = $request_no;
         $this->error = $error;
         $this->data = $data;
     }
@@ -23,7 +27,17 @@ class ResponseMessage extends Message {
      * @return array
      */
     protected function getContent(): array {
-        return [$this->error, $this->data];
+        $response = [
+            'no' => $this->requestNo
+        ];
+
+        if (!is_null($this->error))
+            $response['error'] = $this->error;
+
+        if (!is_null(!$this->data))
+            $response['data'] = $this->data;
+
+        return $response;
     }
 
     /**
@@ -38,6 +52,13 @@ class ResponseMessage extends Message {
      */
     public function getData() {
         return $this->data;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRequestNo() {
+        return $this->requestNo;
     }
 
 }
