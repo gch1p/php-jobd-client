@@ -32,4 +32,16 @@ class MasterClient extends Client {
         );
     }
 
+    /**
+     * @param array[] $jobs
+     * @return ResponseMessage
+     * @throws \Exception
+     */
+    public function runManual(array $jobs): ResponseMessage
+    {
+        return $this->recv(
+            $this->sendRequest(new RequestMessage('run-manual', ['jobs' => $jobs]))
+        );
+    }
+
 }
