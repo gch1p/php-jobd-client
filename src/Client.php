@@ -201,7 +201,8 @@ class Client {
                     throw new \Exception("Malformed REQUEST message: {$e->getMessage()}");
                 }
 
-                $message = new RequestMessage($data['no'], $data['type'], $data['data'] ?? null);
+                $message = new RequestMessage($data['type'], $data['data'] ?? null);
+                $message->setRequestNo($data['no']);
                 if (isset($data['password']))
                     $message->setPassword($data['password']);
 
