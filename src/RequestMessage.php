@@ -49,7 +49,7 @@ class RequestMessage extends Message {
         ];
 
         if (!is_null($this->requestData))
-            $request['data'] = $this->requestData;
+            $request['data'] = (object)$this->requestData;
 
         if (!is_null($this->password))
             $request['password'] = $this->password;

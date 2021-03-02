@@ -48,6 +48,38 @@ class Client {
     }
 
     /**
+     * @param string[] $targets
+     * @return ResponseMessage
+     * @throws \Exception
+     */
+    public function pause(array $targets = []): ResponseMessage
+    {
+        $data = [];
+        if (!empty($targets))
+            $data['targets'] = $targets;
+
+        return $this->recv(
+            $this->sendRequest(new RequestMessage('pause', $data))
+        );
+    }
+
+    /**
+     * @param string[] $targets
+     * @return ResponseMessage
+     * @throws \Exception
+     */
+    public function continue(array $targets = []): ResponseMessage
+    {
+        $data = [];
+        if (!empty($targets))
+            $data['targets'] = $targets;
+
+        return $this->recv(
+            $this->sendRequest(new RequestMessage('continue', $data))
+        );
+    }
+
+    /**
      * @return PongMessage
      * @throws \Exception
      */

@@ -25,10 +25,14 @@ class WorkerClient extends Client {
      * @return ResponseMessage
      * @throws \Exception
      */
-    public function poll(array $targets): ResponseMessage
+    public function poll(array $targets = []): ResponseMessage
     {
+        $data = [];
+        if (!empty($targets))
+            $data['targets'] = $targets;
+
         return $this->recv(
-            $this->sendRequest(new RequestMessage('poll', ['targets' => $targets]))
+            $this->sendRequest(new RequestMessage('poll', $data))
         );
     }
 
