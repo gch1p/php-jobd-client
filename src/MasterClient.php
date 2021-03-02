@@ -4,6 +4,10 @@ namespace jobd;
 
 class MasterClient extends Client {
 
+    public function __construct(int $port = Client::MASTER_PORT, ...$args) {
+        parent::__construct($port, ...$args);
+    }
+
     /**
      * @param array $targets
      * @return ResponseMessage
@@ -17,13 +21,14 @@ class MasterClient extends Client {
     }
 
     /**
+     * @param bool $poll_workers
      * @return ResponseMessage
      * @throws \Exception
      */
-    public function status(): ResponseMessage
+    public function status(bool $poll_workers = false): ResponseMessage
     {
         return $this->recv(
-            $this->sendRequest(new RequestMessage('status'))
+            $this->sendRequest(new RequestMessage('status', ['poll_workers' => $poll_workers]))
         );
     }
 
