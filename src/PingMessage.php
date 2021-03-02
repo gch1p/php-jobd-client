@@ -4,11 +4,13 @@ namespace jobd;
 
 class PingMessage extends Message {
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct(Message::PING);
     }
 
-    protected function getContent(): array {
+    protected function getContent(): array
+    {
         return [];
     }
 

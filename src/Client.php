@@ -25,7 +25,8 @@ class Client {
      * @param string $password
      * @throws \Exception
      */
-    public function __construct(int $port, string $host = '127.0.0.1', string $password = '') {
+    public function __construct(int $port, string $host = '127.0.0.1', string $password = '')
+    {
         $this->port = $port;
         $this->host = $host;
         $this->password = $password;
@@ -41,15 +42,17 @@ class Client {
     /**
      * JobdClient destructor.
      */
-    public function __destruct() {
+    public function __destruct()
+    {
         $this->close();
     }
 
     /**
-     * @return ResponseMessage
+     * @return PongMessage
      * @throws \Exception
      */
-    public function ping() {
+    public function ping(): PongMessage
+    {
         $this->send(new PingMessage());
         return $this->recv();
     }
@@ -58,7 +61,8 @@ class Client {
      * @param RequestMessage $request
      * @return int
      */
-    public function sendRequest(RequestMessage $request) {
+    public function sendRequest(RequestMessage $request): int
+    {
         if ($this->password && !$this->passwordSent) {
             $request->setPassword($this->password);
             $this->passwordSent = true;
@@ -75,17 +79,19 @@ class Client {
     /**
      * @param Message $message
      */
-    public function send(Message $message) {
+    public function send(Message $message)
+    {
         $serialized = $message->serialize();
         fwrite($this->sock, $serialized . self::EOT);
     }
 
     /**
      * @param int $request_no
-     * @return ResponseMessage
+     * @return RequestMessage|ResponseMessage|PingMessage|PongMessage
      * @throws \Exception
      */
-    public function recv(int $request_no = -1) {
+    public function recv(int $request_no = -1)
+    {
         $messages = [];
         $buf = '';
         while (!feof($this->sock)) {
@@ -165,7 +171,8 @@ class Client {
     /**
      * @return int
      */
-    protected function getNextOutgoingRequestNo() {
+    protected function getNextOutgoingRequestNo()
+    {
         $this->lastOutgoingRequestNo++;
 
         if ($this->lastOutgoingRequestNo >= self::REQUEST_NO_LIMIT)
@@ -179,7 +186,8 @@ class Client {
      * @return RequestMessage|ResponseMessage|PingMessage|PongMessage
      * @throws \Exception
      */
-    protected static function parseMessage(string $raw_string) {
+    protected static function parseMessage(string $raw_string)
+    {
         $raw = json_decode($raw_string, true);
         if (!is_array($raw) || count($raw) < 1)
             throw new \Exception("Malformed message: {$raw_string}");
@@ -195,7 +203,7 @@ class Client {
                         ['type',     's',     true],
                         ['no',       'i',     true],
                         ['password', 's',     false],
-                        ['data',     'aifs',  false]
+                        ['data',     'a',     false]
                     ]);
                 } catch (\Exception $e) {
                     throw new \Exception("Malformed REQUEST message: {$e->getMessage()}");
@@ -239,7 +247,8 @@ class Client {
      * @param array $schema
      * @throws \Exception
      */
-    protected static function validateData($data, array $schema) {
+    protected static function validateData($data, array $schema)
+    {
         if (!$data || !is_array($data))
             throw new \Exception('data must be array');
 
@@ -294,7 +303,8 @@ class Client {
     /**
      * Close connection.
      */
-    public function close() {
+    public function close()
+    {
         if (!$this->sock)
             return;
 

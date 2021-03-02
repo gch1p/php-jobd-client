@@ -16,7 +16,8 @@ abstract class Message {
      * Message constructor.
      * @param int $type
      */
-    public function __construct(int $type) {
+    public function __construct(int $type)
+    {
         $this->type = $type;
     }
 
@@ -28,7 +29,8 @@ abstract class Message {
     /**
      * @return string
      */
-    public function serialize(): string {
+    public function serialize(): string
+    {
         $data = [$this->type];
         $content = $this->getContent();
 

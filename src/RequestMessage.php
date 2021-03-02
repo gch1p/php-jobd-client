@@ -12,9 +12,10 @@ class RequestMessage extends Message {
     /**
      * Request constructor.
      * @param string $request_type
-     * @param null $request_data
+     * @param null|array $request_data
      */
-    public function __construct(string $request_type, $request_data = null) {
+    public function __construct(string $request_type, $request_data = null)
+    {
         parent::__construct(Message::REQUEST);
 
         $this->requestData = $request_data;
@@ -24,21 +25,24 @@ class RequestMessage extends Message {
     /**
      * @param string $password
      */
-    public function setPassword(string $password) {
+    public function setPassword(string $password)
+    {
         $this->password = $password;
     }
 
     /**
      * @param int $no
      */
-    public function setRequestNo(int $no) {
+    public function setRequestNo(int $no)
+    {
         $this->requestNo = $no;
     }
 
     /**
      * @return string[]
      */
-    protected function getContent(): array {
+    protected function getContent(): array
+    {
         $request = [
             'type' => $this->requestType,
             'no' => $this->requestNo,

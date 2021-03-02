@@ -11,11 +11,12 @@ class ResponseMessage extends Message {
     /**
      * Response constructor.
      *
-     * @param int $requestNo
+     * @param int $request_no
      * @param null $error
      * @param null $data
      */
-    public function __construct($request_no, $error = null, $data = null) {
+    public function __construct(int $request_no, $error = null, $data = null)
+    {
         parent::__construct(Message::RESPONSE);
 
         $this->requestNo = $request_no;
@@ -26,7 +27,8 @@ class ResponseMessage extends Message {
     /**
      * @return array
      */
-    protected function getContent(): array {
+    protected function getContent(): array
+    {
         $response = [
             'no' => $this->requestNo
         ];
@@ -43,21 +45,24 @@ class ResponseMessage extends Message {
     /**
      * @return mixed
      */
-    public function getError() {
+    public function getError()
+    {
         return $this->error;
     }
 
     /**
      * @return mixed
      */
-    public function getData() {
+    public function getData()
+    {
         return $this->data;
     }
 
     /**
      * @return int
      */
-    public function getRequestNo() {
+    public function getRequestNo(): int
+    {
         return $this->requestNo;
     }
 

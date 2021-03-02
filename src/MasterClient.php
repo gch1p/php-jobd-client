@@ -4,7 +4,8 @@ namespace jobd;
 
 class MasterClient extends Client {
 
-    public function __construct(int $port = Client::MASTER_PORT, ...$args) {
+    public function __construct(int $port = Client::MASTER_PORT, ...$args)
+    {
         parent::__construct($port, ...$args);
     }
 
