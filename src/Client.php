@@ -39,6 +39,13 @@ class Client {
     }
 
     /**
+     * JobdClient destructor.
+     */
+    public function __destruct() {
+        $this->close();
+    }
+
+    /**
      * @return ResponseMessage
      * @throws \Exception
      */
@@ -331,7 +338,11 @@ class Client {
      * @return bool
      */
     public function close() {
-        return fclose($this->sock);
+        if (!$this->sock)
+            return;
+
+        fclose($this->sock);
+        $this->sock = null;
     }
 
 }
