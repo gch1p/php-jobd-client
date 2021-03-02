@@ -55,48 +55,6 @@ class Client {
     }
 
     /**
-     * @param array $targets
-     * @return ResponseMessage
-     * @throws \Exception
-     */
-    public function poke(array $targets) {
-        return $this->recv(
-            $this->sendRequest(new RequestMessage('poke', ['targets' => $targets]))
-        );
-    }
-
-    /**
-     * @return ResponseMessage
-     * @throws \Exception
-     */
-    public function status() {
-        return $this->recv(
-            $this->sendRequest(new RequestMessage('status'))
-        );
-    }
-
-    /**
-     * @param array $targets
-     * @return ResponseMessage
-     * @throws \Exception
-     */
-    public function poll(array $targets) {
-        return $this->recv(
-            $this->sendRequest(new RequestMessage('poll', ['targets' => $targets]))
-        );
-    }
-
-    /**
-     * @param int $id
-     * @return ResponseMessage
-     */
-    public function runManual(int $id) {
-        return $this->recv(
-            $this->sendRequest(new RequestMessage('run-manual', ['id' => $id]))
-        );
-    }
-
-    /**
      * @param RequestMessage $request
      * @return int
      */
