@@ -176,7 +176,7 @@ class Client {
 
     /**
      * @param string $raw_string
-     * @return RequestMessage|ResponseMessage
+     * @return RequestMessage|ResponseMessage|PingMessage|PongMessage
      * @throws \Exception
      */
     protected static function parseMessage(string $raw_string) {
@@ -225,11 +225,9 @@ class Client {
 
             case Message::PING:
                 return new PingMessage();
-                break;
 
             case Message::PONG:
                 return new PongMessage();
-                break;
 
             default:
                 throw new \Exception("Malformed message: unexpected type {$type}");
@@ -239,7 +237,7 @@ class Client {
     /**
      * @param mixed $data
      * @param array $schema
-     * @return bool
+     * @throws \Exception
      */
     protected static function validateData($data, array $schema) {
         if (!$data || !is_array($data))
@@ -294,7 +292,7 @@ class Client {
     }
 
     /**
-     * @return bool
+     * Close connection.
      */
     public function close() {
         if (!$this->sock)
