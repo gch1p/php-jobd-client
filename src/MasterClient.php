@@ -12,7 +12,7 @@ class MasterClient extends Client {
     /**
      * @param array $targets
      * @return ResponseMessage
-     * @throws \Exception
+     * @throws Exception
      */
     public function poke(array $targets): ResponseMessage
     {
@@ -24,7 +24,7 @@ class MasterClient extends Client {
     /**
      * @param bool $poll_workers
      * @return ResponseMessage
-     * @throws \Exception
+     * @throws Exception
      */
     public function status(bool $poll_workers = false): ResponseMessage
     {
@@ -36,7 +36,7 @@ class MasterClient extends Client {
     /**
      * @param array[] $jobs
      * @return ResponseMessage
-     * @throws \Exception
+     * @throws Exception
      */
     public function runManual(array $jobs): ResponseMessage
     {

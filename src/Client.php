@@ -23,7 +23,7 @@ class Client {
      * @param int $port
      * @param string $host
      * @param string $password
-     * @throws \Exception
+     * @throws Exception
      */
     public function __construct(int $port, string $host = '127.0.0.1', string $password = '')
     {
@@ -33,7 +33,7 @@ class Client {
 
         $this->sock = fsockopen($this->host, $this->port);
         if (!$this->sock)
-            throw new \Exception("Failed to connect to {$this->host}:{$this->port}");
+            throw new Exception("Failed to connect to {$this->host}:{$this->port}");
 
         // 0 is reserved
         $this->lastOutgoingRequestNo = mt_rand(1, self::REQUEST_NO_LIMIT);
@@ -50,7 +50,7 @@ class Client {
     /**
      * @param string[] $targets
      * @return ResponseMessage
-     * @throws \Exception
+     * @throws Exception
      */
     public function pause(array $targets = []): ResponseMessage
     {
@@ -66,7 +66,7 @@ class Client {
     /**
      * @param string[] $targets
      * @return ResponseMessage
-     * @throws \Exception
+     * @throws Exception
      */
     public function continue(array $targets = []): ResponseMessage
     {
@@ -81,7 +81,7 @@ class Client {
 
     /**
      * @return PongMessage
-     * @throws \Exception
+     * @throws Exception
      */
     public function ping(): PongMessage
     {
@@ -120,7 +120,7 @@ class Client {
     /**
      * @param int $request_no
      * @return RequestMessage|ResponseMessage|PingMessage|PongMessage
-     * @throws \Exception
+     * @throws Exception
      */
     public function recv(int $request_no = -1)
     {
@@ -146,7 +146,7 @@ class Client {
         } while ($eot_pos !== false && $offset < $buflen-1);
 
         if (empty($messages))
-            throw new \Exception("Malformed response: no messages found. Response: {$buf}");
+            throw new Exception("Malformed response: no messages found. Response: {$buf}");
 
         if (count($messages) > 1)
             trigger_error(__METHOD__.": received more than one message");
@@ -170,7 +170,7 @@ class Client {
             );
 
             if (empty($messages))
-                throw new \Exception("Malformed response: response for {$request_no} not found.");
+                throw new Exception("Malformed response: response for {$request_no} not found.");
 
 
             if (count($messages) == 2) {
@@ -194,7 +194,7 @@ class Client {
 
         if ($response instanceof ResponseMessage) {
             if ($error = $response->getError())
-                throw new \Exception($response->getError());
+                throw new Exception($response->getError());
         }
 
         return $response;
@@ -216,13 +216,13 @@ class Client {
     /**
      * @param string $raw_string
      * @return RequestMessage|ResponseMessage|PingMessage|PongMessage
-     * @throws \Exception
+     * @throws Exception
      */
     protected static function parseMessage(string $raw_string)
     {
         $raw = json_decode($raw_string, true);
         if (!is_array($raw) || count($raw) < 1)
-            throw new \Exception("Malformed message: {$raw_string}");
+            throw new Exception("Malformed message: {$raw_string}");
 
         list($type) = $raw;
 
@@ -237,8 +237,8 @@ class Client {
                         ['password', 's',     false],
                         ['data',     'a',     false]
                     ]);
-                } catch (\Exception $e) {
-                    throw new \Exception("Malformed REQUEST message: {$e->getMessage()}");
+                } catch (Exception $e) {
+                    throw new Exception("Malformed REQUEST message: {$e->getMessage()}");
                 }
 
                 $message = new RequestMessage($data['type'], $data['data'] ?? null);
@@ -257,8 +257,8 @@ class Client {
                         ['data',  'aifs',  false],
                         ['error', 's',     false],
                     ]);
-                } catch (\Exception $e) {
-                    throw new \Exception("Malformed RESPONSE message: {$e->getMessage()}");
+                } catch (Exception $e) {
+                    throw new Exception("Malformed RESPONSE message: {$e->getMessage()}");
                 }
 
                 return new ResponseMessage($data['no'], $data['error'] ?? null, $data['data'] ?? null);
@@ -270,25 +270,25 @@ class Client {
                 return new PongMessage();
 
             default:
-                throw new \Exception("Malformed message: unexpected type {$type}");
+                throw new Exception("Malformed message: unexpected type {$type}");
         }
     }
 
     /**
      * @param mixed $data
      * @param array $schema
-     * @throws \Exception
+     * @throws Exception
      */
     protected static function validateData($data, array $schema)
     {
         if (!$data || !is_array($data))
-            throw new \Exception('data must be array');
+            throw new Exception('data must be array');
 
         foreach ($schema as $schema_item) {
             list ($key_name, $key_types, $key_required) = $schema_item;
             if (!isset($data[$key_name])) {
                 if ($key_required)
-                    throw new \Exception("'{$key_name}' is missing");
+                    throw new Exception("'{$key_name}' is missing");
 
                 continue;
             }
@@ -328,7 +328,7 @@ class Client {
             }
 
             if (!$passed)
-                throw new \Exception("{$key_name}: required type is '{$key_types}'");
+                throw new Exception("{$key_name}: required type is '{$key_types}'");
         }
     }
 
