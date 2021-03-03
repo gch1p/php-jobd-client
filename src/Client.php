@@ -31,12 +31,15 @@ class Client {
         $this->host = $host;
         $this->password = $password;
 
-        $this->sock = fsockopen($this->host, $this->port);
-        if (!$this->sock)
-            throw new Exception("Failed to connect to {$this->host}:{$this->port}");
+        if (($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) === false)
+            throw new Exception("socket_create() failed: ".$this->getSocketError());
 
-        // 0 is reserved
-        $this->lastOutgoingRequestNo = mt_rand(1, self::REQUEST_NO_LIMIT);
+        $this->sock = $socket;
+
+        if ((socket_connect($socket, $host, $port)) === false)
+            throw new Exception("socket_connect() failed: ".$this->getSocketError());
+
+        $this->lastOutgoingRequestNo = mt_rand(1 /* 0 is reserved */, self::REQUEST_NO_LIMIT);
     }
 
     /**
@@ -110,11 +113,22 @@ class Client {
 
     /**
      * @param Message $message
+     * @throws Exception
      */
     public function send(Message $message)
     {
-        $serialized = $message->serialize();
-        fwrite($this->sock, $serialized . self::EOT);
+        $data = $message->serialize() . self::EOT;
+        $remained = strlen($data);
+
+        while ($remained > 0) {
+            $result = socket_write($this->sock, $data);
+            if ($result === false)
+                throw new Exception(__METHOD__ . ": socket_write() failed: ".$this->getSocketError());
+
+            $remained -= $result;
+            if ($remained > 0)
+                $data = substr($data, $result);
+        }
     }
 
     /**
@@ -124,15 +138,27 @@ class Client {
      */
     public function recv(int $request_no = -1)
     {
-        $messages = [];
+        $recv_buf = '';
         $buf = '';
-        while (!feof($this->sock)) {
-            $buf .= fread($this->sock, 1024);
+        $buflen = 0;
+
+        while (true) {
+            $result = socket_recv($this->sock, $recv_buf, 1024, 0);
+            if ($result === false)
+                throw new Exception(__METHOD__ . ": socket_recv() failed: " . $this->getSocketError());
+
+            // peer disconnected
+            if ($result === 0)
+                break;
+
+            $buf .= $recv_buf;
+
             $buflen = strlen($buf);
-            if ($buflen > 0 && $buf[$buflen-1] == self::EOT)
+            if ($buf[$buflen-1] == self::EOT)
                 break;
         }
 
+        $messages = [];
         $offset = 0;
         $eot_pos = 0;
         do {
@@ -340,8 +366,19 @@ class Client {
         if (!$this->sock)
             return;
 
-        fclose($this->sock);
+        socket_close($this->sock);
         $this->sock = null;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getSocketError()
+    {
+        $sle_args = [];
+        if ($this->sock !== null)
+            $sle_args[] = $this->sock;
+        return socket_strerror(socket_last_error(...$sle_args));
     }
 
 }
