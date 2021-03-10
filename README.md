@@ -11,14 +11,14 @@ composer require ch1p/jobd-client
 
 ## Usage
 
-The API is compact and simple, just read the code of `Client.php`.
+The API is compact and simple, just read `WorkerClient.php` and `MasterClient.php`.
 
 Here's a small example.
 
 ```php
 try {
-    $jobd = new jobd\Client(jobd\Client::MASTER_PORT, '127.0.0.1');
-} catch (Exception $e) {
+    $jobd = new jobd\MasterClient();
+} catch (jobd\Exception $e) {
     die("Failed to connect.\n");
 }
 
@@ -28,7 +28,7 @@ try {
     
     // get status from master
     $status = $jobd->status()->getData();
-} catch (Exception $e) {
+} catch (jobd\Exception $e) {
     die('jobd error: '.$e->getMessage()."\n");
 }
 
