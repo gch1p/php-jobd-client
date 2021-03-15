@@ -54,6 +54,36 @@ class WorkerClient extends Client {
      * @return ResponseMessage
      * @throws Exception
      */
+    public function addTarget(string $target, int $concurrency): ResponseMessage
+    {
+        return $this->recv(
+            $this->sendRequest(new RequestMessage('add-target', [
+                'target' => $target,
+                'concurrency' => $concurrency
+            ]))
+        );
+    }
+
+    /**
+     * @param string $target
+     * @return ResponseMessage
+     * @throws Exception
+     */
+    public function removeTarget(string $target): ResponseMessage
+    {
+        return $this->recv(
+            $this->sendRequest(new RequestMessage('remove-target', [
+                'target' => $target
+            ]))
+        );
+    }
+
+    /**
+     * @param string $target
+     * @param int $concurrency
+     * @return ResponseMessage
+     * @throws Exception
+     */
     public function setTargetConcurrency(string $target, int $concurrency): ResponseMessage
     {
         return $this->recv(
