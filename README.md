@@ -11,7 +11,8 @@ composer require ch1p/jobd-client
 
 ## Usage
 
-The API is compact and simple, just read `WorkerClient.php` and `MasterClient.php`.
+The API is compact and simple, just read [`WorkerClient.php`](src/WorkerClient.php),
+[`MasterClient.php`](src/MasterClient.php) and [`Client.php`](src/Client.php).
 
 Here's a small example.
 
