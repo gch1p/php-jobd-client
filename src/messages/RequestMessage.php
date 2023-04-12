@@ -1,6 +1,6 @@
 <?php
 
-namespace jobd;
+namespace jobd\messages;
 
 class RequestMessage extends Message {
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace jobd;
+namespace jobd\messages;
 
 
 abstract class Message {

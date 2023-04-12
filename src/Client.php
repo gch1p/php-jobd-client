@@ -2,8 +2,14 @@
 
 namespace jobd;
 
+use jobd\exceptions\JobdException;
+use jobd\messages\Message;
+use jobd\messages\PingMessage;
+use jobd\messages\PongMessage;
+use jobd\messages\RequestMessage;
+use jobd\messages\ResponseMessage;
 
-class Client {
+abstract class Client {
 
     const WORKER_PORT = 7080;
     const MASTER_PORT = 7081;
@@ -23,7 +29,7 @@ class Client {
      * @param int $port
      * @param string $host
      * @param string $password
-     * @throws Exception
+     * @throws JobdException
      */
     public function __construct(int $port, string $host = '127.0.0.1', string $password = '')
     {
@@ -32,12 +38,12 @@ class Client {
         $this->password = $password;
 
         if (($socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) === false)
-            throw new Exception("socket_create() failed: ".$this->getSocketError());
+            throw new JobdException("socket_create() failed: ".$this->getSocketError());
 
         $this->sock = $socket;
 
         if ((socket_connect($socket, $host, $port)) === false)
-            throw new Exception("socket_connect() failed: ".$this->getSocketError());
+            throw new JobdException("socket_connect() failed: ".$this->getSocketError());
 
         $this->lastOutgoingRequestNo = mt_rand(1 /* 0 is reserved */, self::REQUEST_NO_LIMIT);
     }
@@ -53,7 +59,7 @@ class Client {
     /**
      * @param string[] $targets
      * @return ResponseMessage
-     * @throws Exception
+     * @throws JobdException
      */
     public function pause(array $targets = []): ResponseMessage
     {
@@ -69,7 +75,7 @@ class Client {
     /**
      * @param string[] $targets
      * @return ResponseMessage
-     * @throws Exception
+     * @throws JobdException
      */
     public function continue(array $targets = []): ResponseMessage
     {
@@ -84,7 +90,7 @@ class Client {
 
     /**
      * @return PongMessage
-     * @throws Exception
+     * @throws JobdException
      */
     public function ping(): PongMessage
     {
@@ -113,7 +119,7 @@ class Client {
 
     /**
      * @param Message $message
-     * @throws Exception
+     * @throws JobdException
      */
     public function send(Message $message)
     {
@@ -123,7 +129,7 @@ class Client {
         while ($remained > 0) {
             $result = socket_write($this->sock, $data);
             if ($result === false)
-                throw new Exception(__METHOD__ . ": socket_write() failed: ".$this->getSocketError());
+                throw new JobdException(__METHOD__ . ": socket_write() failed: ".$this->getSocketError());
 
             $remained -= $result;
             if ($remained > 0)
@@ -134,7 +140,7 @@ class Client {
     /**
      * @param int $request_no
      * @return RequestMessage|ResponseMessage|PingMessage|PongMessage
-     * @throws Exception
+     * @throws JobdException
      */
     public function recv(int $request_no = -1)
     {
@@ -145,7 +151,7 @@ class Client {
         while (true) {
             $result = socket_recv($this->sock, $recv_buf, 1024, 0);
             if ($result === false)
-                throw new Exception(__METHOD__ . ": socket_recv() failed: " . $this->getSocketError());
+                throw new JobdException(__METHOD__ . ": socket_recv() failed: " . $this->getSocketError());
 
             // peer disconnected
             if ($result === 0)
@@ -172,7 +178,7 @@ class Client {
         } while ($eot_pos !== false && $offset < $buflen-1);
 
         if (empty($messages))
-            throw new Exception("Malformed response: no messages found. Response: {$buf}");
+            throw new JobdException("Malformed response: no messages found. Response: {$buf}");
 
         if (count($messages) > 1)
             trigger_error(__METHOD__.": received more than one message");
@@ -196,7 +202,7 @@ class Client {
             );
 
             if (empty($messages))
-                throw new Exception("Malformed response: response for {$request_no} not found.");
+                throw new JobdException("Malformed response: response for {$request_no} not found.");
 
 
             if (count($messages) == 2) {
@@ -220,7 +226,7 @@ class Client {
 
         if ($response instanceof ResponseMessage) {
             if ($error = $response->getError())
-                throw new Exception($response->getError());
+                throw new JobdException($response->getError());
         }
 
         return $response;
@@ -242,13 +248,13 @@ class Client {
     /**
      * @param string $raw_string
      * @return RequestMessage|ResponseMessage|PingMessage|PongMessage
-     * @throws Exception
+     * @throws JobdException
      */
     protected static function parseMessage(string $raw_string)
     {
         $raw = json_decode($raw_string, true);
         if (!is_array($raw) || count($raw) < 1)
-            throw new Exception("Malformed message: {$raw_string}");
+            throw new JobdException("Malformed message: {$raw_string}");
 
         list($type) = $raw;
 
@@ -263,8 +269,8 @@ class Client {
                         ['password', 's',     false],
                         ['data',     'a',     false]
                     ]);
-                } catch (Exception $e) {
-                    throw new Exception("Malformed REQUEST message: {$e->getMessage()}");
+                } catch (JobdException $e) {
+                    throw new JobdException("Malformed REQUEST message: {$e->getMessage()}");
                 }
 
                 $message = new RequestMessage($data['type'], $data['data'] ?? null);
@@ -283,8 +289,8 @@ class Client {
                         ['data',  'aifs',  false],
                         ['error', 's',     false],
                     ]);
-                } catch (Exception $e) {
-                    throw new Exception("Malformed RESPONSE message: {$e->getMessage()}");
+                } catch (JobdException $e) {
+                    throw new JobdException("Malformed RESPONSE message: {$e->getMessage()}");
                 }
 
                 return new ResponseMessage($data['no'], $data['error'] ?? null, $data['data'] ?? null);
@@ -296,25 +302,25 @@ class Client {
                 return new PongMessage();
 
             default:
-                throw new Exception("Malformed message: unexpected type {$type}");
+                throw new JobdException("Malformed message: unexpected type {$type}");
         }
     }
 
     /**
      * @param mixed $data
      * @param array $schema
-     * @throws Exception
+     * @throws JobdException
      */
     protected static function validateData($data, array $schema)
     {
         if (!$data || !is_array($data))
-            throw new Exception('data must be array');
+            throw new JobdException('data must be array');
 
         foreach ($schema as $schema_item) {
             list ($key_name, $key_types, $key_required) = $schema_item;
             if (!isset($data[$key_name])) {
                 if ($key_required)
-                    throw new Exception("'{$key_name}' is missing");
+                    throw new JobdException("'{$key_name}' is missing");
 
                 continue;
             }
@@ -354,7 +360,7 @@ class Client {
             }
 
             if (!$passed)
-                throw new Exception("{$key_name}: required type is '{$key_types}'");
+                throw new JobdException("{$key_name}: required type is '{$key_types}'");
         }
     }
 

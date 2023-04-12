@@ -19,7 +19,7 @@ Here's a small example.
 ```php
 try {
     $jobd = new jobd\MasterClient();
-} catch (jobd\Exception $e) {
+} catch (\jobd\exceptions\JobdException $e) {
     die("Failed to connect.\n");
 }
 
@@ -29,7 +29,7 @@ try {
     
     // get status from master
     $status = $jobd->status()->getData();
-} catch (jobd\Exception $e) {
+} catch (\jobd\exceptions\JobdException $e) {
     die('jobd error: '.$e->getMessage()."\n");
 }
 

@@ -2,6 +2,10 @@
 
 namespace jobd;
 
+use jobd\exceptions\JobdException;
+use jobd\messages\RequestMessage;
+use jobd\messages\ResponseMessage;
+
 class WorkerClient extends Client {
 
     public function __construct(int $port = Client::WORKER_PORT, ...$args)
@@ -49,10 +53,22 @@ class WorkerClient extends Client {
     }
 
     /**
+     * @param array[] $jobs
+     * @return ResponseMessage
+     * @throws JobdException
+     */
+    public function sendSignal(array $jobs): ResponseMessage
+    {
+        return $this->recv(
+            $this->sendRequest(new RequestMessage('send-signal', ['jobs' => $jobs]))
+        );
+    }
+
+    /**
      * @param string $target
      * @param int $concurrency
      * @return ResponseMessage
-     * @throws Exception
+     * @throws JobdException
      */
     public function addTarget(string $target, int $concurrency): ResponseMessage
     {
@@ -67,7 +83,7 @@ class WorkerClient extends Client {
     /**
      * @param string $target
      * @return ResponseMessage
-     * @throws Exception
+     * @throws JobdException
      */
     public function removeTarget(string $target): ResponseMessage
     {
@@ -82,7 +98,7 @@ class WorkerClient extends Client {
      * @param string $target
      * @param int $concurrency
      * @return ResponseMessage
-     * @throws Exception
+     * @throws JobdException
      */
     public function setTargetConcurrency(string $target, int $concurrency): ResponseMessage
     {
