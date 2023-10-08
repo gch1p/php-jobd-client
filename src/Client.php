@@ -184,7 +184,7 @@ abstract class Client {
             trigger_error(__METHOD__.": received more than one message");
 
         $response = null;
-        $messages = array_map('self::parseMessage', $messages);
+        $messages = array_map(self::class.'::parseMessage', $messages);
         if ($request_no != -1) {
             /**
              * @var ResponseMessage[] $messages
